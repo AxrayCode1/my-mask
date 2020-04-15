@@ -4,7 +4,6 @@ import Masks from '../../components/Masks/Masks';
 import axios from '../../axios';
 import Modal from '../../components/UI/Modal/Modal';
 import Spinner from '../../components/UI/Spinner/Spinner';
-import { find } from 'async';
 
 
 class MaskLayout extends Component {

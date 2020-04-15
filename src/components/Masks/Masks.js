@@ -4,22 +4,20 @@ import Mask from './Mask/Mask';
 
 const masks = (props) => {
     let masksElement = null;
-    console.log(props);
+    // console.log(props);
     masksElement = props.data.map(element => {        
-        const name = element['properties']['name'];
-        const address = element['properties']['address'];
-        const phone = element['properties']['phone'];
-        const adultCount = element['properties']['mask_adult'];
-        const childCount = element['properties']['mask_child'];
-        const note = element['properties']['note'];
+        const info = {
+            name: element['properties']['name'],
+            address: element['properties']['address'],
+            phone: element['properties']['phone'],
+            adultCount: element['properties']['mask_adult'],
+            childCount: element['properties']['mask_child'],
+            note: element['properties']['note'],
+            updated: element['properties']['updated']
+        }        
         return (
             <Mask 
-                address={address} 
-                phone={phone}
-                title={name} 
-                adult={adultCount} 
-                child={childCount}
-                note={note}             
+                info={info}
             />
         )        
     });
