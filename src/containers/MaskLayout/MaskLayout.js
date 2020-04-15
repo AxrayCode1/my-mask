@@ -7,7 +7,6 @@ import Spinner from '../../components/UI/Spinner/Spinner';
 import Button from '../../components/UI/Button/Button';
 
 import classes from './MaskLayout.css';
-import { thisTypeAnnotation } from 'babel-types';
 
 class MaskLayout extends Component {
     state = {

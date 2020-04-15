@@ -6,6 +6,7 @@ const masks = (props) => {
     let masksElement = null;
     // console.log(props);
     masksElement = props.data.map(element => {        
+        // if()
         const info = {
             name: element['properties']['name'],
             address: element['properties']['address'],
@@ -13,7 +14,9 @@ const masks = (props) => {
             adultCount: element['properties']['mask_adult'],
             childCount: element['properties']['mask_child'],
             note: element['properties']['note'],
-            updated: element['properties']['updated']
+            updated: element['properties']['updated'],
+            latitude: element['geometry']['coordinates'][1],
+            longitude: element['geometry']['coordinates'][0]
         }        
         return (
             <Mask 
