@@ -5,14 +5,29 @@ import axios from '../../axios';
 import Modal from '../../components/UI/Modal/Modal';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import Button from '../../components/UI/Button/Button';
+import Input from '../../components/UI/Input/Input';
 
 import classes from './MaskLayout.css';
 
 class MaskLayout extends Component {
-    state = {
-        maskInfos: null,
+    state = {        
+        maskInfoChilds: null,
+        maskInfoAdults: null,
         loading: false,
-        town: null
+        town: null,
+        filterType: 'child',
+        selectMaskType: {
+            elementType: 'select',
+            elementConfig: {
+                options: [
+                    {value: 'child', displayValue: '兒童'},
+                    {value: 'adult', displayValue: '大人'}
+                ]                       
+            },
+            value: 'child',
+            validation: {},
+            valid: true        
+        }
     }
 
     bubbleSort = (inputArr) => {
@@ -41,6 +56,7 @@ class MaskLayout extends Component {
     };
 
     findMasks = (data,town) =>{
+        let maskHaveAdults = [];
         let maskHaveChilds = [];
         const locationFilters={
             country: '桃園市',
@@ -52,13 +68,17 @@ class MaskLayout extends Component {
                     if(el['properties']['county'] === locationFilters.country && el['properties']['town'] === locationFilters.town && !el['properties']['note'].includes('暫停')){                                                
                         if(el['properties']['mask_child'] > 0){                            
                             maskHaveChilds.push(el);
-                        }                        
+                        }  
+                        if(el['properties']['mask_adult'] > 0){                            
+                            maskHaveAdults.push(el);
+                        }                       
                     }
                 }
             });
         }
         this.bubbleSort(maskHaveChilds);
-        return maskHaveChilds.reverse();
+        this.bubbleSort(maskHaveAdults);
+        return [maskHaveChilds.reverse(), maskHaveAdults.reverse()];
     }
 
     loadData = (town) => {
@@ -68,7 +88,8 @@ class MaskLayout extends Component {
                 const findDatas = this.findMasks(res.data,town);
                 // console.log(findDatas);
                 this.setState({
-                    maskInfos: findDatas,
+                    maskInfoChilds: findDatas[0],
+                    maskInfoAdults: findDatas[1],
                     loading : false,
                     town: town
                 });
@@ -76,7 +97,8 @@ class MaskLayout extends Component {
             .catch(err=>{
                 console.log(err);
                 this.setState({
-                    maskInfos: null,
+                    maskInfoChilds: null,
+                    maskInfoAdults: null,
                     loading : false,
                     town: null
                 });
@@ -91,13 +113,51 @@ class MaskLayout extends Component {
         this.loadData(town);
     }
 
+    selectTypeChangedHandler = (event) => {
+        console.log(event.target.value);
+        const updatedSelect = {...this.state.selectMaskType};
+        updatedSelect.value = event.target.value;
+        this.setState({
+            selectMaskType: updatedSelect,
+            filterType: event.target.value
+        })
+    }
+
+    selectMaskComponent = () => {        
+        return (
+            <Input 
+                    key='selectType'
+                    elementType={this.state.selectMaskType.elementType}
+                    elementConfig={this.state.selectMaskType.elementConfig}
+                    value={this.state.selectMaskType.value} 
+                    invalid={!this.state.selectMaskType.valid}
+                    shouldValidate={this.state.selectMaskType.validation}
+                    touched={this.state.selectMaskType.touched}
+                    changed={this.selectTypeChangedHandler}/>
+        )
+    }
+
     render(){
+        const selectElement = this.selectMaskComponent();
+        // console.log(selectElement);
         let maskInfo = null;
-        if(this.state.maskInfos){
+        // console.log(this.state);
+        if(this.state.maskInfoChilds && this.state.maskInfoAdults){
+            let masks = null;
+            switch(this.state.filterType){
+                case ('child'):
+                    masks = this.state.maskInfoChilds;
+                    break;
+                case ('adult'):
+                    masks = this.state.maskInfoAdults;
+                    break;
+                default:
+                    masks = null;
+            }
             maskInfo = (
                 <div style={{margin:'60px 0', textAlign:'center'}}>
-                    <h3>桃園市-{this.state.town} : {this.state.maskInfos.length}間</h3>
-                    { this.state.maskInfos ? <Masks data={this.state.maskInfos}/> : null}
+                    <h3>桃園市-{this.state.town} : {masks.length}間</h3>
+                    { masks ? <Masks data={masks}/> : null}
                 </div>
             )
         }
@@ -106,9 +166,11 @@ class MaskLayout extends Component {
                 <Modal show={this.state.loading}>
                     <Spinner />
                 </Modal>                
-                <header className={classes.Toolbar}>
-                    <Button clicked={()=>this.searchTownMaskHandler('桃園區')}>桃園區</Button>
+                <header className={classes.Toolbar}> 
+                    {selectElement}                   
                     <Button clicked={()=>this.searchTownMaskHandler('八德區')}>八德區</Button>
+                    <Button clicked={()=>this.searchTownMaskHandler('桃園區')}>桃園區</Button>                    
+                    <Button clicked={()=>this.searchTownMaskHandler('蘆竹區')}>蘆竹區</Button>
                 </header>
                 {maskInfo}
             </Aux>
