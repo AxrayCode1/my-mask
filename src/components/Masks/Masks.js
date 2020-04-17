@@ -6,17 +6,20 @@ const masks = (props) => {
     let masksElement = null;
     // console.log(props);
     masksElement = props.data.map(element => {        
-        // if()
-        const info = {
-            name: element['properties']['name'],
-            address: element['properties']['address'],
-            phone: element['properties']['phone'],
-            adultCount: element['properties']['mask_adult'],
-            childCount: element['properties']['mask_child'],
-            note: element['properties']['note'],
-            updated: element['properties']['updated'],
+        // if()        
+        let checkField = [];
+        const fields = ['name','address','phone','mask_adult','mask_child','note','updated'];
+        fields.forEach(el => {
+            checkField[el] = true;
+        })
+        let info = {            
             latitude: element['geometry']['coordinates'][1],
             longitude: element['geometry']['coordinates'][0]
+        }            
+        for(let key in element['properties']){
+            if(checkField[key]){
+                info[key] = element['prperties'][key];
+            }
         }        
         return (
             <Mask 
